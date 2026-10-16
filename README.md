@@ -1,50 +1,42 @@
-Azure Cloud Project
- Overview:
+# Azure Cloud Project
+
+ ## Overview
+  
   This project demonstrates deploying a Python Flask web application to Microsoft Azure App Service with GitHub integration and Azure monitoring services.
 
-Technologies Used:
- Microsoft Azure
- Azure App Service
- Azure App Service Plan
- Application Insights
- GitHub
- Python 3.10
- Flask
+## Technologies Used
 
-Azure Services Used:
- Resource Group
- App Service
- App Service Plan
- Application Insights
- Managed Identities
+ - Microsoft Azure
+ - Azure App Service
+ - Azure App Service Plan
+ - Application Insights
+ - GitHub
+ - Python 3.10
+ - Flask
 
-Architecture:
- GitHub Repository - GitHub Deployment - Azure App Service - Application Insights
+## Azure Services Used
+ 
+ - Resource Group
+ - App Service
+ - App Service Plan
+ - Application Insights
+ - Managed Identities
 
-Screenshots
- Resource Group Overview:
-  screenshots/Resource%20Group%20Overview.png
+## Architecture
 
-App Service Overview:
- screenshots/App%20Service%20Overview.png
+GitHub Repository → GitHub Deployment → Azure App Service → Application Insights
 
-Deployment Center:
- screenshots/Deployment%20Center.png
+## Skills Demonstrated
+ 
+ - Azure Resource Management
+ - Web Application Hosting
+ - GitHub Integration
+ - Continuous Deployment
+ - Application Monitoring
+ - Troubleshooting
 
-Running Application:
- screenshots/Running%20Website.png
-
-Application Insights:
-screenshots/Application%20Insights.png
-
-Skills Demonstrated:
- Azure Resource Management
- Web Application Hosting
- GitHub Integration
- Continuous Deployment
- Application Monitoring
- Troubleshooting
-Lessons Learned:
+## Lessons Learned
+ 
  This project provided hands-on experience deploying and managing a web application in Azure. It demonstrated cloud resource management, GitHub
  integration, application monitoring, and troubleshooting service availability issues.
 
