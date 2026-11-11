@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Azure Cloud Project</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main>
+    <header>
+      <span class="badge">Healthy</span>
+      <h1>Azure Cloud Project</h1>
+      <p>A Python Flask app running on Azure App Service, deployed automatically from GitHub with monitoring through Application Insights.</p>
+    </header>
+
+    <section class="grid" aria-label="Runtime details">
+      <div class="card"><span>App Service</span><strong>{{ info.app }}</strong></div>
+      <div class="card"><span>Region</span><strong>{{ info.region }}</strong></div>
+      <div class="card"><span>Version</span><strong>{{ info.version }}</strong></div>
+      <div class="card"><span>Python</span><strong>{{ info.python }}</strong></div>
+      <div class="card"><span>Uptime</span><strong>{{ info.uptime_seconds }}s</strong></div>
+      <div class="card"><span>Monitoring</span><strong>{{ info.monitoring }}</strong></div>
+    </section>
+
+    <footer>
+      <a href="/health">/health</a> &middot; <a href="/api/info">/api/info</a>
+      &middot; {{ info.server_time_utc }}
+    </footer>
+  </main>
+</body>
+</html>
