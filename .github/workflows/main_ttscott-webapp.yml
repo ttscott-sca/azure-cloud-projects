@@ -1,6 +1,6 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-# More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
+# Build, test and deploy the Flask app to Azure App Service.
+# Azure sign-in uses OpenID Connect (OIDC), so there are no stored passwords or secrets
+# beyond the three identifiers below.
 
 name: Build and deploy Python app to Azure Web App - ttscott-webapp
 
@@ -8,58 +8,69 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read #This is required for actions/checkout
 
     steps:
       - uses: actions/checkout@v4
 
+      # Keep this in step with the Python version set on the App Service.
       - name: Set up Python version
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
 
-      # 🛠️ Local Build Section (Optional)
-      # The following section in your workflow is designed to catch build issues early on the client side, before deployment. This can be helpful for debugging and validation. However, if this step significantly increases deployment time and early detection is not critical for your workflow, you may remove this section to streamline the deployment process.
-      - name: Create and Start virtual environment and Install dependencies
-        run: |
-          python -m venv venv
-          source venv/bin/activate
-          pip install -r requirements.txt
-                
-      # By default, when you enable GitHub CI/CD integration through the Azure portal, the platform automatically sets the SCM_DO_BUILD_DURING_DEPLOYMENT application setting to true. This triggers the use of Oryx, a build engine that handles application compilation and dependency installation (e.g., pip install) directly on the platform during deployment. Hence, we exclude the antenv virtual environment directory from the deployment artifact to reduce the payload size. 
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Run tests
+        run: python -m pytest -q
+
+      # App Service builds the app itself (Oryx), so the local venv is not shipped.
       - name: Upload artifact for deployment jobs
+        if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: python-app
           path: |
             .
             !antenv/
-
-      # 🚫 Opting Out of Oryx Build
-      # If you prefer to disable the Oryx build process during deployment, follow these steps:
-      # 1. Remove the SCM_DO_BUILD_DURING_DEPLOYMENT app setting from your Azure App Service Environment variables.
-      # 2. Refer to sample workflows for alternative deployment strategies: https://github.com/Azure/actions-workflow-samples/tree/master/AppService
-      
+            !venv/
+            !.git/
+            !tests/
+            !.pytest_cache/
 
   deploy:
+    # Only deploy from main, never from a pull request.
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     needs: build
+    environment:
+      name: Production
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
+      id-token: write # required to request the OIDC token
+      contents: read
 
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: python-app
-      
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -73,4 +84,22 @@ jobs:
         with:
           app-name: 'ttscott-webapp'
           slot-name: 'Production'
+
+      # Fails the run if the new version isn't answering on /health.
+      - name: Smoke test
+        run: |
+          url="${{ steps.deploy-to-webapp.outputs.webapp-url }}/health"
+          for attempt in 1 2 3 4 5 6; do
+            if curl --fail --silent --show-error --max-time 20 "$url"; then
+              echo
+              echo "Smoke test passed on attempt $attempt"
+              exit 0
+            fi
+            echo "Attempt $attempt failed, waiting 20s for the app to start..."
+            sleep 20
+          done
+          echo "Smoke test failed: $url did not return a healthy response"
+          exit 1
+
+
           
