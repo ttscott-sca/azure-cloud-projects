@@ -2,7 +2,7 @@
 
 A Python Flask web app deployed to **Azure App Service** with automated GitHub Actions deployments, secure OIDC sign-in to Azure, and monitoring through **Application Insights**.
 
-**Live site:** `https://YOUR-APP-NAME.azurewebsites.net` (replace with your App Service URL)
+**Live site:** https://ttscott-webapp-eagzekf9b7bxaqh0.eastus-01.azurewebsites.net
 **Health check:** `/health` &nbsp;|&nbsp; **Runtime info:** `/api/info`
 
 ## Architecture
@@ -60,6 +60,8 @@ flowchart LR
 - System-assigned managed identity
 - App Service health check pointed at `/health`
 - Optional diagnostic logs sent to a Log Analytics workspace
+
+- All hardening settings were applied and verified, and a deployment test confirmed the pipeline still works afterward.
 
 ## Run it locally
 
